@@ -1,5 +1,5 @@
 # standalone_latex
-script to convert .tex pictures into .pdf
+script to convert .tex pictures (tikz) into pdfs
 
 # Usage
 ```
