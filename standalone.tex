@@ -16,18 +16,18 @@
 \usepackage{pgfplots}
 \usepgfplotslibrary{fillbetween}
 \pgfplotsset{compat=1.17}
-\pgfplotsset{every tick label/.append style={font=\tiny}}
-\pgfplotsset{
-  /pgfplots/xlabel near ticks/.style={
-     /pgfplots/every axis x label/.style={
-        at={(ticklabel cs:0.45)},anchor=near ticklabel
-     }
-  },
-  /pgfplots/ylabel near ticks/.style={
-     /pgfplots/every axis y label/.style={
-        at={(ticklabel cs:0.5)},rotate=90,anchor=near ticklabel}
-     }
-}
+\pgfplotsset{every tick label/.append style={font=\large}}
+% \pgfplotsset{
+%   /pgfplots/xlabel near ticks/.style={
+%      /pgfplots/every axis x label/.style={
+%         at={(ticklabel cs:0.45)},anchor=near ticklabel
+%      }
+%   },
+%   /pgfplots/ylabel near ticks/.style={
+%      /pgfplots/every axis y label/.style={
+%         at={(ticklabel cs:0.5)},rotate=90,anchor=near ticklabel}
+%      }
+% }
 \usepgfplotslibrary{groupplots}
 \usetikzlibrary{pgfplots.groupplots}
 \usetikzlibrary{plotmarks}
@@ -35,8 +35,8 @@
 \usetikzlibrary{positioning}
 % \usetikzlibrary{calc}
 % \usepgfplotslibrary{external}
-\newcommand{\fwidth}{\textwidth}
-\newcommand{\fheight}{5cm}
+%\newcommand{\fwidth}{\textwidth}
+%\newcommand{\fheight}{5cm}
 % \tikzexternalize
 % \tikzset{external/force remake}
 % \newcommand{\alg}{\textsf{IDIL}}
