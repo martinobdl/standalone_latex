@@ -27,16 +27,18 @@ with open("standalone.tex", "rt") as f:
     first_part = f.readlines()[:-2]
 
 def file_content_and_pdf(name):
-    file = "".join(first_part) + "\\input{" + name + "}\n" + "\\end{document}"
+    file_content = "".join(first_part) + "\\input{" + name + "}\n" + "\\end{document}"
     basename = os.path.splitext(os.path.basename(name))[0]
     outfile = os.path.join(args.o, basename+'.pdf')
-    return file, outfile
+    return file_content, outfile
 
+ORIGINAL_IN_FILE = []
 IN_FILES = []
 FILE_CONTENTS = []
 OUT_FILES_PDF = []
 
 if args.i is not None:
+    ORIGINAL_IN_FILE = [name]
     name = args.i.name
     file, pdf_name = file_content_and_pdf(name)
     FILE_CONTENTS = [file]
@@ -44,8 +46,8 @@ if args.i is not None:
     OUT_FILES_PDF = [pdf_name]
 else:
     directory_in = dir_path(args.I)
-    list_tex = glob.glob(os.path.join(args.I, "*.tex"))
-    for i,tex in enumerate(list_tex):
+    ORIGINAL_IN_FILE = glob.glob(os.path.join(args.I, "*.tex"))
+    for i,tex in enumerate(ORIGINAL_IN_FILE):
         file, pdf_name = file_content_and_pdf(tex)
         FILE_CONTENTS.append(file)
         IN_FILES.append("/tmp/tmp"+str(i)+".tex")
@@ -58,14 +60,20 @@ for i,tmp_file_name in enumerate(IN_FILES):
 
 
 if __name__ == "__main__":
-    for i,(tmp_tex_file, out_pdf) in enumerate(zip(IN_FILES, OUT_FILES_PDF)):
-        subprocess.run(['pdflatex', '--enable-write18', '--extra-mem-top=100000000',
-                        '--synctex=1', '-output-directory=/tmp', '-jobname=foo'+str(i),
-                        tmp_tex_file, ],
-                       check=True, text=True)
+    for i,(tmp_tex_file, out_pdf, original_tex) in enumerate(zip(IN_FILES, OUT_FILES_PDF, ORIGINAL_IN_FILE)):
+        if os.path.exists(out_pdf) and os.path.getmtime(original_tex) < os.path.getmtime(out_pdf):
+            print(Fore.GREEN + "{} already comliled".format(out_pdf))
+            print(Style.RESET_ALL)
 
-        subprocess.run(['mv', '/tmp/foo'+str(i)+'.pdf', out_pdf],
-                       check=True, text=True)
+        else:
+            subprocess.run(['pdflatex', '--enable-write18', '--extra-mem-top=100000000',
+                            '--synctex=1', '-output-directory=/tmp', '-jobname=foo'+str(i),
+                            tmp_tex_file, ],
+                           check=True, text=True)
 
-        print(Fore.GREEN + "Saved in {}".format(out_pdf))
-        print(Style.RESET_ALL)
+            subprocess.run(['mv', '/tmp/foo'+str(i)+'.pdf', out_pdf],
+                           check=True, text=True)
+
+            print(Fore.GREEN + "saved in {}".format(out_pdf))
+            print(Style.RESET_ALL)
+
