@@ -37,6 +37,9 @@ IN_FILES = []
 FILE_CONTENTS = []
 OUT_FILES_PDF = []
 
+if args.i is not None and args.I is not None:
+    raise Exception("You cannot pass both -i and -I as arguments")
+
 if args.i is not None:
     ORIGINAL_IN_FILE = [name]
     name = args.i.name
