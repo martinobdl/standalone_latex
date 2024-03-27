@@ -17,8 +17,9 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('-i', metavar='in-file', type=argparse.FileType('rt'), nargs='?')
 parser.add_argument('-I', metavar='in-directory', type=dir_path, nargs='?')
-parser.add_argument('-c', metavar='config-file', type=argparse.FileType('rt'))
 parser.add_argument('-o', metavar='out-dir', type=dir_path, required=True)
+parser.add_argument('-f', action='store_true', help="force recompile")
+parser.add_argument('-c', action='store_true', help="run pdfcrop")
 
 
 args = parser.parse_args()
@@ -41,8 +42,8 @@ if args.i is not None and args.I is not None:
     raise Exception("You cannot pass both -i and -I as arguments")
 
 if args.i is not None:
-    ORIGINAL_IN_FILE = [name]
     name = args.i.name
+    ORIGINAL_IN_FILE = [name]
     file, pdf_name = file_content_and_pdf(name)
     FILE_CONTENTS = [file]
     IN_FILES = ["/tmp/tmp.tex"]
@@ -64,8 +65,8 @@ for i,tmp_file_name in enumerate(IN_FILES):
 
 if __name__ == "__main__":
     for i,(tmp_tex_file, out_pdf, original_tex) in enumerate(zip(IN_FILES, OUT_FILES_PDF, ORIGINAL_IN_FILE)):
-        if os.path.exists(out_pdf) and os.path.getmtime(original_tex) < os.path.getmtime(out_pdf):
-            print(Fore.GREEN + "{} already comliled".format(out_pdf))
+        if os.path.exists(out_pdf) and os.path.getmtime(original_tex) < os.path.getmtime(out_pdf) and args.f is False:
+            print(Fore.YELLOW + "{} already comliled".format(out_pdf))
             print(Style.RESET_ALL)
 
         else:
@@ -74,8 +75,16 @@ if __name__ == "__main__":
                             tmp_tex_file, ],
                            check=True, text=True)
 
-            subprocess.run(['mv', '/tmp/foo'+str(i)+'.pdf', out_pdf],
-                           check=True, text=True)
+            if not args.c:
+                subprocess.run(['mv', '/tmp/foo'+str(i)+'.pdf', out_pdf],
+                                check=True, text=True)
+            else:
+                subprocess.run(["pdfcrop", "--margins", "7", "/tmp/foo"+str(i)+".pdf"], check=True, text=True)
+                subprocess.run(['mv', '/tmp/foo'+str(i)+'-crop.pdf', out_pdf],
+                                check=True, text=True)
+                print(Fore.RED + "{} cropped".format(out_pdf))
+                print(Style.RESET_ALL)
+
 
             print(Fore.GREEN + "saved in {}".format(out_pdf))
             print(Style.RESET_ALL)
